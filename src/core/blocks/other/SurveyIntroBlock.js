@@ -1,36 +1,29 @@
 import React from 'react'
+import TextBlock from 'core/blocks/other/TextBlock'
+import LogoMain from 'core/components/LogoMain'
+import SponsorsBlock from 'core/blocks/other/SponsorsBlock'
+import TranslatorsBlock from 'core/blocks/other/TranslatorsBlock'
+import NewsletterBlock from 'core/blocks/other/NewsletterBlock'
 import IntroductionFooter from 'core/pages/IntroductionFooter'
-import T from 'core/i18n/T'
-import styled from 'styled-components'
-import { mq } from 'core/theme'
-import variables from 'config/variables.yml'
-const { IntroLogo } = require(`surveys/${variables.surveyType}/logo/IntroLogo`)
 
-const SurveyIntroBlock = () => (
-    <>
-        <IntroLogo />
-        <div className="SurveyIntro">
-            <Content className="SurveyIntro__Content">
-                <T k="sections.introduction.description" md={true} />
-                <IntroductionFooter />
-            </Content>
+const SurveyIntroBlock = ({ data }) => (
+    <div className="SurveyIntro">
+        <div className="SurveyIntro__Content">
+            <div className="main-logo-wrapper">
+                {/* <img
+                    className="logo-image"
+                    src="/images/stateofjs-logo.svg"
+                    alt="State of JavaScript 2019 Logo"
+                /> */}
+                <LogoMain/>
+            </div>
+            <TextBlock text={data} />
+            <IntroductionFooter />
         </div>
-    </>
+        <NewsletterBlock />
+        <SponsorsBlock />
+        <TranslatorsBlock />
+    </div>
 )
-
-const Content = styled.div`
-    @media ${mq.large} {
-        max-width: 700px;
-        margin: 0 auto;
-    }
-    .block__content {
-        p:first-child {
-            @media ${mq.mediumLarge} {
-                max-width: 700px;
-                font-size: $larger-font;
-            }
-        }
-    }
-`
 
 export default SurveyIntroBlock

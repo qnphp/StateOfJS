@@ -2,8 +2,10 @@ import React from 'react'
 import { format } from 'd3-format'
 import get from 'lodash/get'
 import styled from 'styled-components'
-import { mq, spacing } from 'core/theme'
+import mq from 'core/theme/mq'
+import ToolPeriodicElement from 'core/blocks/tools/ToolPeriodicElement'
 import { useI18n } from 'core/i18n/i18nContext'
+import periodicTableData from '../../../../config/periodic_table.yml'
 import Button from 'core/components/Button'
 
 const starsFormatter = format('.2s')
@@ -11,6 +13,7 @@ const starsFormatter = format('.2s')
 const ToolHeaderBlock = ({ block, data }) => {
     const { translate } = useI18n()
 
+    const toolId = get(block, 'variables.toolId')
     const toolName = get(data, 'entity.name')
     const homepageLink = get(data, 'entity.homepage')
     const description = get(data, 'entity.description')
@@ -20,12 +23,19 @@ const ToolHeaderBlock = ({ block, data }) => {
 
     return (
         <Container className="ToolHeader">
+            <ElementWrapper className="ToolHeader__Element">
+                <ToolPeriodicElement
+                    tool={toolId}
+                    name={toolName}
+                    symbol={periodicTableData.tools[toolId] || '??'}
+                />
+            </ElementWrapper>
             <Content className="ToolHeader__Content">
                 <Header className="ToolHeader__Header">
                     <Title className="ToolHeader__Title">{toolName}</Title>
                     {stars && (
                         <Stars className="ToolHeader__Stars">
-                            {starsFormatter(stars)} {translate('blocks.entity.github_stars')}
+                            {starsFormatter(stars)} {translate('block.tool.github_stars')}
                         </Stars>
                     )}
                 </Header>
@@ -40,7 +50,7 @@ const ToolHeaderBlock = ({ block, data }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            {translate('blocks.entity.homepage_link')}
+                            {translate('block.tool.homepage_link')}
                         </Link>
                     )}
                     {githubLink && (
@@ -52,7 +62,7 @@ const ToolHeaderBlock = ({ block, data }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            {translate('blocks.entity.github_link')}
+                            GitHub
                         </Link>
                     )}
                 </Links>
@@ -63,12 +73,29 @@ const ToolHeaderBlock = ({ block, data }) => {
 
 const Container = styled.div`
     @media ${mq.small} {
-        margin-bottom: ${spacing(2)};
+        margin-bottom: ${props => props.theme.spacing * 2}px;
     }
 
     @media ${mq.mediumLarge} {
         display: flex;
-        margin-bottom: ${spacing(4)};
+        margin-bottom: ${props => props.theme.spacing * 4}px;
+    }
+`
+
+const ElementWrapper = styled.div`
+    svg {
+        display: block;
+    }
+
+    @media ${mq.small} {
+        max-width: 150px;
+        margin: 0 auto ${props => props.theme.spacing / 4}px auto;
+    }
+
+    @media ${mq.mediumLarge} {
+        flex-shrink: 1;
+        flex-basis: 120px;
+        margin-right: ${props => props.theme.spacing}px;
     }
 `
 
@@ -96,7 +123,7 @@ const Title = styled.h2`
 const Description = styled.div`
     @media ${mq.small} {
         text-align: center;
-        margin: ${spacing()} 0;
+        margin: ${props => props.theme.spacing}px 0;
     }
 `
 
@@ -113,7 +140,7 @@ const Stars = styled.div`
 const Links = styled.div`
     display: flex;
     align-items: center;
-    margin-top: ${spacing(0.5)};
+    margin-top: ${props => props.theme.spacing / 2}px;
 
     @media ${mq.small} {
         justify-content: center;
@@ -121,7 +148,7 @@ const Links = styled.div`
 `
 
 const Link = styled(Button)`
-    margin-right: ${spacing(0.5)};
+    margin-right: ${props => props.theme.spacing / 2}px;
 `
 
 export default ToolHeaderBlock

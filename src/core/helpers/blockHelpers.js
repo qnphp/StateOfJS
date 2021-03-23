@@ -1,69 +1,90 @@
-import get from 'lodash/get'
-import { siteTitle, capturesUrl, hashtag, year } from 'config/config.yml'
+import removeMarkdown from 'remove-markdown'
+import { getTranslationValuesFromContext, getPageLabel } from '../helpers/pageHelpers'
 
-export const getBlockTitleKey = (block, page) => {
-    const { blockName, titleId } = block
-    if (titleId) {
-        return titleId
-    } else if (blockName) {
-        return `blocks.${blockName}.title`
-    } else {
-        const pageId = block.pageId || page.i18nNamespace || page.id
-        const blockId = block.id.replace('_others', '.others')
-        return `${pageId}.${blockId}`
+export const getBlockTitle = (block, context, translate, { format = 'short', values = {} } = {}) => {
+    const { id, title, blockName } = block
+    let blockTitle
+
+    const titleValues = {
+        values: {
+            ...getTranslationValuesFromContext(context, translate),
+            ...values
+        }
     }
-}
 
-export const getBlockDescriptionKey = (block, page) => {
-    const { blockName, descriptionId } = block
-    if (descriptionId) {
-        return descriptionId
+    if (title) {
+        blockTitle = title
     } else if (blockName) {
-        return `blocks.${blockName}.description`
+        blockTitle = translate(`block.title.${blockName}`, titleValues)
     } else {
-        const pageId = block.pageId || page.i18nNamespace || page.id
-        const blockId = block.id.replace('_others', '.others')
-        return `${pageId}.${blockId}.description`
+        blockTitle = translate(`block.title.${id}`, titleValues)
     }
+
+    if (format === 'full') {
+        const pageLabel = getPageLabel(context, translate)
+        blockTitle = `${pageLabel} - ${blockTitle}`
+    }
+
+    return blockTitle
 }
 
-export const getBlockTitle = (block, page, translate) => {
-    return block.title || translate(getBlockTitleKey(block, page))
+export const getBlockDescription = (
+    block,
+    context,
+    translate,
+    { isMarkdownEnabled = true, values = {} } = {}
+) => {
+    const { id, description, blockName } = block
+    let blockDescription
+
+    const descriptionValues = {
+        values: {
+            ...getTranslationValuesFromContext(context, translate),
+            ...values
+        }
+    }
+
+    if (description) {
+        blockDescription = description
+    } else if (blockName) {
+        blockDescription = translate(`block.description.${blockName}`, descriptionValues)
+    } else {
+        blockDescription = translate(`block.description.${id}`, descriptionValues)
+    }
+
+    if (isMarkdownEnabled !== true) {
+        blockDescription = removeMarkdown(blockDescription)
+    }
+
+    return blockDescription
 }
 
-export const getBlockDescription = (block, page, translate) => {
-    return block.description || translate(`${getBlockDescriptionKey(block, page)}`, {}, null)
-}
-
-export const getBlockImage = (block, context) => {
-    return `${capturesUrl}${get(context, 'locale.path')}/${block.id}.png`
+export const getBlockImage = (block, context, translate) => {
+    return `${context.host}/images/captures/${block.id}.png`
 }
 
 export const getBlockMeta = (block, context, translate, title) => {
     const { id } = block
-    const link = `${context.host}${context.currentPath}${id}`
-    const trackingId = `${context.currentPath}${id}`.replace(/^\//, '')
+    const link = `${context.host}${context.basePath}${id}`
+    const trackingId = `${context.basePath}${id}`.replace(/^\//, '')
 
     title = title || getBlockTitle(block, context, translate)
 
     const imageUrl = getBlockImage(block, context, translate)
 
-    const values = {
-        title,
-        link,
-        hashtag,
-        year,
-        siteTitle,
-    }
-
     const twitterText = translate('share.block.twitter_text', {
-        values,
+        values: {
+            title,
+            link
+        }
     })
-    const emailSubject = translate('share.block.subject', {
-        values,
-    })
+
+    const emailSubject = translate('share.block.subject')
     const emailBody = translate('share.block.body', {
-        values,
+        values: {
+            title,
+            link
+        }
     })
 
     return {
@@ -73,19 +94,6 @@ export const getBlockMeta = (block, context, translate, title) => {
         twitterText,
         emailSubject,
         emailBody,
-        imageUrl,
+        imageUrl
     }
-}
-
-export const getAllBlocks = (sitemap) => {
-    let allBlocks = []
-    sitemap.contents.forEach((page) => {
-        allBlocks = [...allBlocks, ...page.blocks]
-        if (page.children) {
-            page.children.forEach((page) => {
-                allBlocks = [...allBlocks, ...page.blocks]
-            })
-        }
-    })
-    return allBlocks
 }

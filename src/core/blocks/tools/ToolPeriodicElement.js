@@ -2,9 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { navigate } from 'gatsby'
-import { fontWeight } from 'core/theme'
 
-const PeriodicElement = ({ className, name = '', symbol, number, size, path, x, y }) => {
+const PeriodicElement = ({ className, name, symbol, number, size, path, x, y }) => {
     return (
         <svg
             width={size || '100%'}
@@ -48,7 +47,7 @@ const PeriodicElement = ({ className, name = '', symbol, number, size, path, x, 
 
 PeriodicElement.propTypes = {
     name: PropTypes.string,
-    symbol: PropTypes.string.isRequired,
+    symbol: PropTypes.string.isRequired
 }
 
 const Frame = styled.rect`
@@ -64,7 +63,7 @@ const NumberNode = styled.text`
 `
 
 const Symbol = styled.text`
-    font-weight: ${fontWeight('bold')};
+    font-weight: ${({ theme }) => theme.typography.weights.bold};
     pointer-events: none;
     fill: ${({ theme }) => theme.colors.link};
 `

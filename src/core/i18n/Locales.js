@@ -1,57 +1,53 @@
 import React from 'react'
 import styled from 'styled-components'
+import mq from 'core/theme/mq'
+import locales from '../../../config/locales.yml'
 import { usePageContext } from 'core/helpers/pageContext'
 import { Link } from 'gatsby'
-import { mq, spacing, fontSize, fontWeight } from 'core/theme'
-import get from 'lodash/get'
-import BlockCompletionIndicator from 'core/blocks/block/BlockCompletionIndicator'
 
 const Container = styled.div`
     display: grid;
     grid-template-columns: auto auto;
-    grid-column-gap: ${spacing(1.5)};
-    grid-row-gap: ${spacing(1.5)};
+    grid-column-gap: ${props => props.theme.spacing}px;
+    grid-row-gap: ${props => props.theme.spacing}px;
 `
 
-const Item = styled.span`
+const Item = styled(Link)`
     text-align: center;
-    font-size: ${fontSize('medium')};
-    display: flex;
-    align-items: center;
+    font-size: ${props => props.theme.typography.sizes.medium};
+    
     @media ${mq.smallMedium} {
-        font-size: ${fontSize('small')};    
+        font-size: ${props => props.theme.typography.sizes.small};    
     }
     @media ${mq.large} {
-        font-size: ${fontSize('medium')};
+        font-size: ${props => props.theme.typography.sizes.medium};
     }
     
     &._is-current {
-        font-weight: ${fontWeight('bold')};
+        font-weight: ${props => props.theme.typography.weights.bold};
     }
 }
 `
 
 const Locales = () => {
     const context = usePageContext()
-    const links = get(context, 'locales', []).map((locale) => {
+    const links = locales.map(locale => {
         return {
             ...locale,
-            link: locale.path + context.basePath,
-            isCurrent: locale.locale === context.locale,
+            link: `${locale.path === 'default' ? '' : `/${locale.path}`}${context.basePath}`,
+            isCurrent: locale.locale === context.locale
         }
     })
 
     return (
         <Container className="Locales">
-            {links.map(({ label, id, link, isCurrent, completion }) => (
-                <Item key={id} className={`Locales__Item${isCurrent ? ' _is-current' : ''}`}>
-                    <Link to={link}>{label}</Link>
-                    {completion < 95 && (
-                        <BlockCompletionIndicator
-                            completion={{ percentage: completion }}
-                            variant="grey"
-                        />
-                    )}
+            {links.map(({ label, locale, link, isCurrent }) => (
+                <Item
+                    key={locale}
+                    className={`Locales__Item${isCurrent ? ' _is-current' : ''}`}
+                    to={link}
+                >
+                    {label}
                 </Item>
             ))}
         </Container>

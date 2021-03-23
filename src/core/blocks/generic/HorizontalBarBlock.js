@@ -5,14 +5,7 @@ import ChartContainer from 'core/charts/ChartContainer'
 import HorizontalBarChart from 'core/charts/generic/HorizontalBarChart'
 
 const HorizontalBarBlock = ({ block, data }) => {
-    const {
-        id,
-        mode = 'relative',
-        units: defaultUnits = 'percentage',
-        translateData,
-        i18nNamespace,
-        colorVariant,
-    } = block
+    const { id, mode = 'relative', units: defaultUnits = 'percentage', translateData } = block
 
     const [units, setUnits] = useState(defaultUnits)
 
@@ -24,11 +17,10 @@ const HorizontalBarBlock = ({ block, data }) => {
                 <HorizontalBarChart
                     total={total}
                     buckets={buckets}
-                    i18nNamespace={i18nNamespace || id}
+                    i18nNamespace={id}
                     translateData={translateData}
                     mode={mode}
                     units={units}
-                    colorVariant={colorVariant}
                 />
             </ChartContainer>
         </Block>
@@ -42,16 +34,15 @@ HorizontalBarBlock.propTypes = {
         showDescription: PropTypes.bool,
         translateData: PropTypes.bool,
         mode: PropTypes.oneOf(['absolute', 'relative']),
-        units: PropTypes.oneOf(['percentage', 'count']),
-        colorVariant: PropTypes.oneOf(['primary', 'secondary']),
+        units: PropTypes.oneOf(['percentage', 'count'])
     }).isRequired,
     data: PropTypes.shape({
         buckets: PropTypes.arrayOf(
             PropTypes.shape({
-                id: PropTypes.string.isRequired,
+                id: PropTypes.string.isRequired
             })
-        ).isRequired,
-    }).isRequired,
+        ).isRequired
+    }).isRequired
 }
 
 export default memo(HorizontalBarBlock)

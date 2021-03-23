@@ -42,8 +42,8 @@ const Indicator = memo(({ position }) => (
  * - Expand: force a 600px width
  */
 const ChartContainer = ({ children, height, fit = false, className = '', vscroll = false }) => (
-    <ChartContainerOuter className={`ChartContainerOuter ${className}`} style={{ height }}>
-        <Container className="ChartContainer" style={{ height }}>
+    <ChartContainerOuter className={`ChartContainerOuter ${className}`}>
+        <Container className="ChartContainer">
             <ChartContainerInner
                 className={`ChartContainerInner${!fit ? ' ChartContainerInner--expand' : ''}`}
                 style={{ height }}
@@ -67,10 +67,10 @@ const ChartContainer = ({ children, height, fit = false, className = '', vscroll
 )
 
 ChartContainer.propTypes = {
-    height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    height: PropTypes.number,
     fit: PropTypes.bool,
     className: PropTypes.string,
-    vscroll: PropTypes.bool,
+    vscroll: PropTypes.bool
 }
 
 const ChartContainerOuter = styled.div`
@@ -90,7 +90,7 @@ const Container = styled.div`
 const ChartContainerInner = styled.div`
     &.ChartContainerInner--expand {
         @media ${mq.small} {
-            /* max-height: 400px; */
+            max-height: 400px;
         }
         @media ${mq.smallMedium} {
             min-width: 800px;

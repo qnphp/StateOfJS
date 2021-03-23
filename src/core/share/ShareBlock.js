@@ -6,14 +6,13 @@ import ReactGA from 'react-ga'
 import { useI18n } from 'core/i18n/i18nContext'
 import { getBlockMeta } from 'core/helpers/blockHelpers'
 import { usePageContext } from 'core/helpers/pageContext'
-import { mq } from 'core/theme'
+import mq from 'core/theme/mq'
 import Button from 'core/components/Button'
 import ShareTwitter from './ShareTwitter'
 import ShareLinkedIn from './ShareLinkedIn'
 import ShareFacebook from './ShareFacebook'
 import ShareEmail from './ShareEmail'
 import ShareImage from './ShareImage'
-import T from 'core/i18n/T'
 
 const ShareIcon = () => (
     <Icon
@@ -43,14 +42,14 @@ const ShareBlock = ({ block, section, className, toggleClass, title }) => {
     const context = usePageContext()
     const { translate } = useI18n()
 
-    const toggleOptions = (e) => {
+    const toggleOptions = e => {
         e.preventDefault()
         // toggle parent component's class
         toggleClass && toggleClass()
         setShowOptions(!showOptions)
         ReactGA.event({
             category: 'Clicks',
-            action: `${section} chart toggle`,
+            action: `${section} chart toggle`
         })
     }
 
@@ -59,19 +58,19 @@ const ShareBlock = ({ block, section, className, toggleClass, title }) => {
     return (
         <Container
             className={classNames('ShareBlock', className, {
-                '_is-visible': showOptions,
+                '_is-visible': showOptions
             })}
         >
             <ButtonWrapper>
                 <ShareButton
                     className="ShareButton"
                     size="small"
-                    onClick={(e) => {
+                    onClick={e => {
                         toggleOptions(e)
                     }}
                 >
-                    <T k="share.share" />
-                    {/* <ShareIcon /> */}
+                    <span className="desktop">{translate('share.share')}</span>
+                    <ShareIcon />
                 </ShareButton>
             </ButtonWrapper>
             <Popup className="ShareBlock__Popup">
@@ -91,8 +90,8 @@ const ShareBlock = ({ block, section, className, toggleClass, title }) => {
 
 ShareBlock.propTypes = {
     block: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-    }).isRequired,
+        id: PropTypes.string.isRequired
+    }).isRequired
 }
 
 const Container = styled.div`
@@ -103,15 +102,13 @@ const Container = styled.div`
 `
 
 const ButtonWrapper = styled.div`
-    @media ${mq.mediumLarge} {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `
 
 const ShareButton = styled(Button)`
-    /* @media ${mq.small} {
+    @media ${mq.small} {
         width: 30px;
         height: 30px;
         display: flex;
@@ -121,17 +118,17 @@ const ShareButton = styled(Button)`
         &.Button--small {
             padding: 0;
         }
-    } */
+    }
 `
 
 const Icon = styled.svg`
     stroke: ${({ theme }) => theme.colors.link};
     height: 16px;
     width: 16px;
-
+    
     ${ShareButton}:hover &,
     .ShareBlock._is-visible & {
-        stroke: ${({ theme }) => theme.colors.link};
+        stroke: ${({ theme }) => theme.colors.contrast};
     }
 `
 
@@ -150,7 +147,7 @@ const Popup = styled.div`
     }
     @media ${mq.mediumLarge} {
         top: 0;
-        left: 110%;
+        left: 0;
     }
 `
 

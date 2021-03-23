@@ -1,6 +1,6 @@
-import React, { memo, useMemo } from 'react'
+import React, { memo, useMemo, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { useTheme } from 'styled-components'
+import { ThemeContext } from 'styled-components'
 import { ResponsiveBar } from '@nivo/bar'
 import { useI18n } from 'core/i18n/i18nContext'
 import { useBarChart } from 'core/charts/hooks'
@@ -9,14 +9,14 @@ import ChartLabel from 'core/components/ChartLabel'
 
 const breakpoint = 600
 
-const getMargins = (viewportWidth) => ({
+const getMargins = viewportWidth => ({
     top: 10,
     right: 70,
     bottom: viewportWidth < breakpoint ? 110 : 60,
-    left: 40,
+    left: 60
 })
 
-const getLabelsLayer = (units) => (props) => {
+const getLabelsLayer = units => props => {
     // adjust settings according to dimensions
     let fontSize = 13
     let rotation = 0
@@ -25,19 +25,18 @@ const getLabelsLayer = (units) => (props) => {
         rotation = -90
     }
 
-    return props.bars.map((bar) => {
+    return props.bars.map(bar => {
         const label = units === 'percentage' ? `${bar.data.value}%` : bar.data.value
 
         return (
             <ChartLabel
                 key={bar.key}
                 label={label}
-                transform={`translate(${bar.x + bar.width / 2},${
-                    bar.y + bar.height / 2
-                }) rotate(${rotation})`}
+                transform={`translate(${bar.x + bar.width / 2},${bar.y +
+                    bar.height / 2}) rotate(${rotation})`}
                 fontSize={fontSize}
                 style={{
-                    pointerEvents: 'none',
+                    pointerEvents: 'none'
                 }}
             />
         )
@@ -48,25 +47,23 @@ const VerticalBarChart = ({
     viewportWidth,
     className,
     buckets,
-    bucketKeys,
     total,
     i18nNamespace,
     translateData,
     mode,
     units,
-    chartProps,
-    colorVariant = 'primary',
+    chartProps
 }) => {
-    const theme = useTheme()
+    const theme = useContext(ThemeContext)
     const { translate } = useI18n()
 
-    const { formatValue, maxValue, ticks } = useBarChart({
+    const { formatTick, formatValue, maxValue, ticks } = useBarChart({
         buckets,
         total,
         i18nNamespace,
         shouldTranslate: translateData,
         mode,
-        units,
+        units
     })
 
     const labelsLayer = useMemo(() => getLabelsLayer(units), [units])
@@ -82,7 +79,7 @@ const VerticalBarChart = ({
                 padding={0.4}
                 theme={theme.charts}
                 animate={false}
-                colors={[theme.colors.barChart[colorVariant]]}
+                colors={[theme.colors.lineChartDefaultColor]}
                 borderRadius={1}
                 enableLabel={false}
                 enableGridX={false}
@@ -90,23 +87,23 @@ const VerticalBarChart = ({
                 enableGridY={true}
                 axisLeft={{
                     format: formatValue,
-                    tickValues: ticks,
+                    tickValues: ticks
                 }}
                 axisRight={{
                     format: formatValue,
                     tickValues: ticks,
-                    legend: translate(`charts.axis_legends.users_${units}`),
+                    legend: translate(`users_${units}`),
                     legendPosition: 'middle',
-                    legendOffset: 52,
+                    legendOffset: 52
                 }}
                 axisBottom={{
-                    format: (v) => bucketKeys.find((key) => key.id === v).shortLabel,
-                    legend: translate(`charts.axis_legends.${i18nNamespace}`),
+                    format: formatTick,
+                    legend: translate(`${i18nNamespace}.axis_legend`),
                     legendPosition: 'middle',
                     legendOffset: viewportWidth < breakpoint ? 90 : 50,
-                    tickRotation: viewportWidth < breakpoint ? -45 : 0,
+                    tickRotation: viewportWidth < breakpoint ? -45 : 0
                 }}
-                tooltip={(barProps) => (
+                tooltip={barProps => (
                     <BarTooltip
                         i18nNamespace={i18nNamespace}
                         shouldTranslate={translateData}
@@ -121,22 +118,21 @@ const VerticalBarChart = ({
 }
 
 VerticalBarChart.propTypes = {
-    total: PropTypes.number,
+    total: PropTypes.number.isRequired,
     buckets: PropTypes.arrayOf(
         PropTypes.shape({
             id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
             count: PropTypes.number.isRequired,
-            percentage: PropTypes.number,
+            percentage: PropTypes.number
         })
     ).isRequired,
     i18nNamespace: PropTypes.string.isRequired,
     translateData: PropTypes.bool.isRequired,
     mode: PropTypes.oneOf(['absolute', 'relative']).isRequired,
-    units: PropTypes.oneOf(['percentage', 'count']).isRequired,
-    colorVariant: PropTypes.oneOf(['primary', 'secondary']),
+    units: PropTypes.oneOf(['percentage', 'count']).isRequired
 }
 VerticalBarChart.defaultProps = {
-    translateData: true,
+    translateData: true
 }
 
 export default memo(VerticalBarChart)

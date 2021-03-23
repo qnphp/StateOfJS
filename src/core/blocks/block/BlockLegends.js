@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import styled, { css } from 'styled-components'
-import { mq, spacing, fontSize, color } from 'core/theme'
+import styled, { ThemeContext } from 'styled-components'
 import BlockLegendsItem from './BlockLegendsItem'
-import { useBucketKeys } from '../../helpers/useBucketKeys'
+import { useI18n } from 'core/i18n/i18nContext'
+import { keys } from 'core/constants'
 
 const BlockLegends = ({
     block,
@@ -17,41 +17,55 @@ const BlockLegends = ({
     onMouseLeave,
     onClick,
     data,
-    units,
-    position,
-    useShortLabels = layout === 'horizontal',
-    current,
+    legends,
+    units
 }) => {
     const { id: blockId, bucketKeysName = blockId } = block
+    const { translate } = useI18n()
+    const theme = useContext(ThemeContext)
+    const blockKeys = keys[bucketKeysName]
 
-    const blockLegends = useBucketKeys(bucketKeysName)
+    if (!legends && !blockKeys) {
+        throw new Error(
+            `Could not find any keys defined for ${bucketKeysName}. If there are none, set "showLegend: false" on block definition.`
+        )
+    }
+
+    const classNames = ['Legends', `Legends--${layout}`]
+    if (withFrame === true) {
+        classNames.push('Legends--withFrame')
+    }
+
+    const blockLegends =
+        legends ||
+        blockKeys.map(({ id: keyId }) => ({
+            id: `${bucketKeysName}.${keyId}`,
+            label: translate(`${bucketKeysName}.${keyId}.long`),
+            keyLabel: `${translate(`${bucketKeysName}.${keyId}.short`)}:`,
+            color: theme.colors.ranges[bucketKeysName] ? theme.colors.ranges[bucketKeysName][keyId] : undefined
+        }))
 
     const rootStyle = { ...style }
 
     return (
-        <Container className="Block__Legends" style={rootStyle} layout={layout} withFrame={withFrame} position={position}>
-            <ContainerInner layout={layout}>
-                {blockLegends.map(({ id, label, shortLabel, color }) => (
-                    <BlockLegendsItem
-                        key={id}
-                        id={id}
-                        current={current}
-                        label={label}
-                        shortLabel={shortLabel}
-                        useShortLabels={useShortLabels}
-                        color={color}
-                        style={itemStyle}
-                        chipSize={chipSize}
-                        chipStyle={chipStyle}
-                        onMouseEnter={onMouseEnter}
-                        onMouseLeave={onMouseLeave}
-                        onClick={onClick}
-                        data={data && Array.isArray(data) && data.find((b) => b.id === id)}
-                        units={units}
-                        layout={layout}
-                    />
-                ))}
-            </ContainerInner>
+        <Container className={classNames.join(' ')} style={rootStyle}>
+            {blockLegends.map(({ id, label, color, keyLabel }) => (
+                <BlockLegendsItem
+                    key={id}
+                    id={id}
+                    label={label}
+                    color={color}
+                    style={itemStyle}
+                    chipSize={chipSize}
+                    chipStyle={chipStyle}
+                    onMouseEnter={onMouseEnter}
+                    onMouseLeave={onMouseLeave}
+                    onClick={onClick}
+                    keyLabel={keyLabel}
+                    data={data && Array.isArray(data) && data.find(b => b.id === id)}
+                    units={units}
+                />
+            ))}
         </Container>
     )
 }
@@ -65,7 +79,7 @@ BlockLegends.propTypes = {
     chipStyle: PropTypes.object.isRequired,
     onMouseEnter: PropTypes.func,
     onMouseLeave: PropTypes.func,
-    onClick: PropTypes.func,
+    onClick: PropTypes.func
 }
 
 BlockLegends.defaultProps = {
@@ -74,63 +88,12 @@ BlockLegends.defaultProps = {
     style: {},
     itemStyle: {},
     chipStyle: {},
-    chipSize: 16,
+    chipSize: 16
 }
 
-const Container = styled.table`
-    font-size: ${fontSize('small')};
-    /* margin-top: ${spacing()}; */
-    margin-top: ${({ position }) => (position === 'bottom' ? spacing() : 0)};
-    margin-bottom: ${({ position }) => (position === 'top' ? spacing() : 0)};
-    width: 100%;
-
-    ${(props) => {
-        if (props.withFrame) {
-            return css`
-                border: 1px solid ${color('border')};
-                padding: ${spacing(0.5)};
-
-                @media ${mq.small} {
-                    padding: ${spacing(0.5)};
-                }
-            `
-        }
-    }}
-`
-
-const ContainerInner = styled.tbody`
-    ${(props) => {
-        if (props.layout === 'horizontal') {
-            return css`
-                @media ${mq.mediumLarge} {
-                    display: grid;
-                }
-
-                @media ${mq.medium} {
-                    grid-template-columns: 1fr 1fr;
-                    column-gap: ${spacing()};
-                }
-
-                @media ${mq.large} {
-                    // fit in as many columns as possible as long as they're wider than 150px
-                    grid-template-columns: repeat(auto-fit, minmax(120px, auto));
-                    column-gap: ${spacing()};
-                }
-            `
-        }
-
-        if (props.layout === 'vertical') {
-            return css`
-                /* display: flex;
-                flex-direction: column;
-                justify-content: space-between; */
-
-                @media ${mq.small} {
-                    margin-top: ${spacing()};
-                }
-            `
-        }
-    }}
+const Container = styled.div`
+    font-size: ${props => props.theme.typography.sizes.small};
+    margin-top: ${props => props.theme.spacing}px;
 `
 
 export default BlockLegends

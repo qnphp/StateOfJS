@@ -1,12 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
-import { mq, spacing } from 'core/theme'
+import mq from 'core/theme/mq'
 
 const Link = styled.a`
     display: block;
     flex-shrink: 0;
-    z-index: 1000;
-    position: relative;
+
     &:last-child {
         margin-right: 0;
     }
@@ -24,7 +23,7 @@ const Link = styled.a`
     &:hover {
         svg path,
         svg circle {
-            fill: ${({ theme }) => theme.colors.link};
+            fill: ${({ theme }) => theme.colors.contrast};
         }
     }
 
@@ -69,7 +68,7 @@ const Link = styled.a`
                 transform: translateX(-50%) translateY(-275%);
             }
             @media ${mq.mediumLarge} {
-                transform: translateX(20%);
+                transform: translateX(280%);
             }
         }
         &.ShareLink--facebook {
@@ -77,15 +76,15 @@ const Link = styled.a`
                 transform: translateX(-200%) translateY(-200%);
             }
             @media ${mq.mediumLarge} {
-                transform: translateX(60%);
+                transform: translateX(320%);
             }
         }
         &.ShareLink--linkedin {
+            @media ${mq.mediumLarge} {
+                transform: translateX(390%);
+            }
             @media ${mq.small} {
                 transform: translateX(-275%) translateY(-50%);
-            }
-            @media ${mq.mediumLarge} {
-                transform: translateX(130%);
             }
         }
         &.ShareLink--email {
@@ -93,7 +92,7 @@ const Link = styled.a`
                 transform: translateX(-200%) translateY(100%);
             }
             @media ${mq.mediumLarge} {
-                transform: translateX(200%);
+                transform: translateX(460%);
             }
         }
         &.ShareLink--image {
@@ -101,7 +100,7 @@ const Link = styled.a`
                 transform: translateX(-50%) translateY(175%);
             }
             @media ${mq.mediumLarge} {
-                transform: translateX(270%);
+                transform: translateX(530%);
             }
         }
     }
@@ -110,11 +109,8 @@ const Link = styled.a`
         transition: none;
         flex-grow: 1;
         text-align: center;
-        padding: ${spacing()} ${spacing(0.33)};
-
-        &:not(:last-child) {
-            border-right: ${({ theme }) => theme.separationBorder};
-        }
+        padding: ${({ theme }) => theme.spacing}px ${({ theme }) => theme.spacing / 3}px;
+        border-right: ${({ theme }) => theme.separationBorder};
 
         &:hover {
             background: ${({ theme }) => theme.colors.backgroundAlt};
@@ -125,10 +121,6 @@ const Link = styled.a`
             margin: 0 auto;
             height: 24px;
             width: 24px;
-        }
-
-        @media ${mq.small} {
-            position: static;
         }
     }
 `

@@ -3,14 +3,34 @@ import PropTypes from 'prop-types'
 import ReactGA from 'react-ga'
 import styled from 'styled-components'
 import Trans from 'core/i18n/Trans'
-import { emailOctopusUrl, emailOctopusCode, emailOctopusSiteKey } from 'config/config.yml'
-import { mq, spacing } from 'core/theme'
-import Button from 'core/components/Button'
+import { emailOctopusUrl, emailOctopusCode, emailOctopusSiteKey } from 'core/constants'
 const postUrl = emailOctopusUrl
+
+const Container = styled.div``
+
+const Email = styled.input`
+    display: block;
+    padding: ${props => props.theme.spacing / 2}px;
+    border: none;
+    margin-right: ${props => props.theme.spacing / 2}px;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 300px;
+`
+
+const ErrorFeedback = styled.div`
+    padding: ${props => props.theme.spacing}px;
+    margin-bottom: ${props => props.theme.spacing}px;
+`
+
+const SuccessFeedback = styled.div`
+    border: ${props => props.theme.separationBorder};
+    padding: ${props => props.theme.spacing}px;
+`
 
 export default class Newsletter extends Component {
     static propTypes = {
-        line: PropTypes.string,
+        line: PropTypes.string
     }
 
     state = {
@@ -18,35 +38,33 @@ export default class Newsletter extends Component {
         submitted: false,
         loading: false,
         error: null,
-        success: null,
+        success: null
     }
 
-    handleChange = (e) => {
+    handleChange = e => {
         const email = e.target.value
         this.setState({
-            email,
+            email
         })
     }
 
-    handleSubmit = async (e) => {
+    handleSubmit = async e => {
         const { email } = this.state
 
         this.setState({ loading: true })
 
-        console.log('SUBMITTING')
-
         e.preventDefault()
         ReactGA.event({
             category: 'Subscribe',
-            action: `Newsletter subscribe`,
+            action: `Newsletter subscribe`
         })
         const response = await fetch(postUrl, {
             method: 'POST',
             body: `field_0=${encodeURIComponent(email)}`,
             headers: {
                 Accept: '*/*',
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            },
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            }
         })
         const result = await response.json()
         const { error, message } = result
@@ -65,9 +83,11 @@ export default class Newsletter extends Component {
 
         return (
             <Trans>
-                {(translate) => {
+                {translate => {
+                    const { submitLabel = translate('general.notify_me') } = this.props
+
                     return (
-                        <>
+                        <Container className={`Newsletter Newsletter--${loading ? 'loading' : ''}`}>
                             {error && (
                                 <ErrorFeedback className="Newsletter__Error">
                                     {error.message}
@@ -76,101 +96,42 @@ export default class Newsletter extends Component {
                             {success ? (
                                 <SuccessFeedback>{success.message}</SuccessFeedback>
                             ) : (
-                                <Form
+                                <form
                                     method="post"
                                     action={postUrl}
                                     datasitekey={emailOctopusSiteKey}
                                     onSubmit={this.handleSubmit}
                                 >
                                     <Email
+                                        className="Newsletter__Email"
                                         id="field_0"
                                         name="field_0"
                                         type="email"
-                                        placeholder={translate('blocks.newsletter.email')}
+                                        placeholder={translate('general.your_email')}
                                         onChange={this.handleChange}
                                         value={email}
                                         disabled={loading}
-                                        isLoading={loading}
                                     />
                                     <input
                                         type="text"
                                         name={emailOctopusCode}
                                         tabIndex="-1"
                                         autoComplete="nope"
-                                        style={{ display: 'none' }}
+                                        className="Newsletter__Hidden"
                                     />
-                                    <SubmitButton as="button" type="submit" name="subscribe">
-                                        {translate('blocks.newsletter.submit')}
-                                    </SubmitButton>
-                                </Form>
+                                    <button
+                                        type="submit"
+                                        name="subscribe"
+                                        className="Newsletter__Button Button"
+                                    >
+                                        {submitLabel}
+                                    </button>
+                                </form>
                             )}
-                        </>
+                        </Container>
                     )
                 }}
             </Trans>
         )
     }
 }
-
-const Form = styled.form`
-    margin: 0;
-
-    @media ${mq.mediumLarge} {
-        display: flex;
-    }
-`
-
-const Email = styled.input`
-    display: block;
-    padding: ${spacing(0.5)};
-    border: none;
-    margin-right: ${spacing(0.5)};
-    flex-grow: 1;
-    width: 100%;
-    max-width: 300px;
-    background: ${(props) => (props.isLoading ? 'red' : undefined)};
-    /*
-    @include small {
-        margin-bottom: $spacing/2;
-    }
-    @include font-regular;
-    &:focus {
-        outline: none;
-        border-color: $hover-color;
-    }
-    .Newsletter--loading & {
-        background: $grey;
-    }
-    */
-`
-
-const SubmitButton = styled(Button)`
-    min-width: 140px;
-    display: block;
-    @media ${mq.small} {
-        margin-top: ${spacing()};
-        width: 100%;
-    }
-    /*
-    @include small {
-        width: 100%;
-    }
-    &:hover{
-        @include ants;
-    }
-    */
-`
-
-const ErrorFeedback = styled.div`
-    padding: ${spacing()};
-    margin-bottom: ${spacing()};
-    /*
-    border: 1px solid $red;
-    color: $red;
-    */
-`
-
-const SuccessFeedback = styled.div`
-    border: ${(props) => props.theme.separationBorder};
-    padding: ${spacing()};
-`

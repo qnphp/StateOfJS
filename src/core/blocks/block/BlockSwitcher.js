@@ -1,15 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import blockRegistry from 'core/helpers/blockRegistry'
-import { keys } from 'core/bucket_keys'
+import { keys } from 'core/constants'
 import isEmpty from 'lodash/isEmpty'
 import Block from 'core/blocks/block/Block'
 import get from 'lodash/get'
-import { usePageContext } from 'core/helpers/pageContext'
 
-const BlockSwitcher = ({ pageData, block, index, ...props }) => {
-    const pageContext = usePageContext()
-    const { id, blockType, hidden } = block
+const BlockSwitcher = ({ pageData, block, index }) => {
+    const { id, blockType } = block
     let blockData
     if (!blockRegistry[blockType]) {
         return (
@@ -26,14 +24,12 @@ const BlockSwitcher = ({ pageData, block, index, ...props }) => {
             return (
                 <BlockError
                     block={block}
-                    message={`No available data for block ${id} | path: ${block.dataPath} | type: ${blockType}`}
+                    message={`No available data for block ${id} | type: ${blockType}`}
                 />
             )
         }
     }
-    return hidden && !pageContext.isCapturing ? null : (
-        <BlockComponent block={block} data={blockData} index={index} {...props}/>
-    )
+    return <BlockComponent block={block} data={blockData} index={index} />
 }
 
 class ErrorBoundary extends React.Component {
@@ -68,7 +64,7 @@ const BlockError = ({ message, data, block }) => (
     </Block>
 )
 
-const BlockSwitcherWithBoundary = (props) => (
+const BlockSwitcherWithBoundary = props => (
     <ErrorBoundary {...props}>
         <BlockSwitcher {...props} />
     </ErrorBoundary>
@@ -87,9 +83,9 @@ BlockSwitcher.propTypes = {
         // which mode to use for generic bar charts
         mode: PropTypes.oneOf(['absolute', 'relative']),
         // which unit to use for generic bar charts
-        units: PropTypes.oneOf(['percentage', 'count']),
+        units: PropTypes.oneOf(['percentage', 'count'])
     }),
-    pageData: PropTypes.any.isRequired,
+    pageData: PropTypes.any.isRequired
 }
 
 export default BlockSwitcherWithBoundary

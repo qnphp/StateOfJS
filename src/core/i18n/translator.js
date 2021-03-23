@@ -1,54 +1,19 @@
 import template from 'lodash/template'
 
-/*
-
-Returns the translation string object
-
-*/
-export const getStringTranslator = (locale = {}) => (key, { values } = {}, fallback) => {
-    const { strings = [], ...rest } = locale
-    // reverse strings so that strings added last take priority
-    const s = strings
-        .slice()
-        .reverse()
-        .find((t) => t.key === key)
-
-    if (s && values) {
-        try {
-            s.t = template(s.t, { interpolate: /{([\s\S]+?)}/g })(values)
-        } catch (error) {
-            console.error(error)
-            s.t = `[${locale.id}][ERR] ${key}`
-        }
-    }
-
-    return { ...s, locale: rest }
-}
-
-/*
-
-Returns the translated string (legacy)
-
-*/
-export const getTranslator = (locale = {}) => (key, { values } = {}, fallback) => {
-    const { id, strings = [] } = locale
-    // reverse strings so that strings added last take priority
-    const translation = strings
-        .slice()
-        .reverse()
-        .find((t) => t.key === key)
+export const getTranslator = ({ locale, translations }) => (key, { values } = {}, fallback) => {
+    const translation = translations.find(t => t.key === key)
 
     if (translation === undefined) {
-        return typeof fallback === 'undefined' ? `[${id}] ${key}` : fallback
+        return fallback || `[${locale}] ${key}`
     }
 
     if (values === undefined) return translation.t
 
     try {
-        return template(translation.t, { interpolate: /{([\s\S]+?)}/g })(values)
+        return template(translation.t)(values)
     } catch (error) {
         // console.error(error)
-        return `[${id}][ERR] ${key}`
+        return `[${locale}][ERR] ${key}`
     }
 }
 

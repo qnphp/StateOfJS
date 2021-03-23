@@ -4,32 +4,32 @@ import styled from 'styled-components'
 import { useI18n } from 'core/i18n/i18nContext'
 import { color, spacing, fontSize } from 'core/theme'
 
-const BlockCompletionIndicator = ({ completion, variant = 'pink' }) => {
+const BlockCompletionIndicator = ({ completion }) => {
     const { translate } = useI18n()
-    const colorName1 = variant === 'pink' ? 'link' : 'text'
-    const colorName2 = variant === 'pink' ? 'link' : 'textAlt'
+
     return (
         <Container className="CompletionIndicator">
-            <Tooltip className="CompletionIndicator__Tooltip" colorName={colorName1}>
+            <Tooltip className="CompletionIndicator__Tooltip">
                 {translate('general.completion_percentage')}{' '}
-                <strong>{completion.percentage}%</strong>{' '}
-                {completion.count && <span>({completion.count})</span>}
+                <strong>{completion.percentage}%</strong> ({completion.count})
             </Tooltip>
             <div className="CompletionIndicator__Data sr-only">
                 {translate('general.completion_percentage')}{' '}
-                <strong>{completion.percentage}%</strong>{' '}
-                {completion.count && <span>({completion.count})</span>}
+                <strong>{completion.percentage}%</strong> ({completion.count})
             </div>
             <Chart height="16" width="16" viewBox="0 0 20 20">
-                <ChartBackground r="10" cx="10" cy="10" colorName={colorName2} />
+                <ChartBackground
+                    r="10"
+                    cx="10"
+                    cy="10"
+                />
                 <ChartForeground
-                    colorName={colorName2}
                     r="5"
                     cx="10"
                     cy="10"
                     fill="transparent"
                     strokeWidth="10"
-                    strokeDasharray={`calc(${completion.percentage} * 31.4px / 100) 31.4px`}
+                    strokeDasharray={`calc(${completion.percentage} * 31.4 / 100) 31.4`}
                     transform="rotate(-90) translate(-20)"
                 />
             </Chart>
@@ -39,9 +39,9 @@ const BlockCompletionIndicator = ({ completion, variant = 'pink' }) => {
 
 BlockCompletionIndicator.propTypes = {
     completion: PropTypes.shape({
-        count: PropTypes.number,
-        percentage: PropTypes.number.isRequired,
-    }).isRequired,
+        count: PropTypes.number.isRequired,
+        percentage: PropTypes.number.isRequired
+    }).isRequired
 }
 
 const Tooltip = styled.div`
@@ -55,11 +55,11 @@ const Tooltip = styled.div`
     border-radius: 3px;
     transition: all 200ms ease-in;
     pointer-events: none;
-    background: ${({ colorName }) => color(colorName)};
+    background: ${color('link')};
     color: ${color('background')};
 
     &:after {
-        bottom: -15px;
+        top: 99%;
         left: 50%;
         content: ' ';
         height: 0;
@@ -68,7 +68,7 @@ const Tooltip = styled.div`
         pointer-events: none;
         margin-left: -8px;
         border: 8px solid rgba(136, 183, 213, 0);
-        border-top-color: ${({ colorName }) => color(colorName)};
+        border-top-color: ${color('link')};
     }
 `
 
@@ -89,12 +89,12 @@ const Chart = styled.svg`
 `
 
 const ChartBackground = styled.circle`
-    fill: ${({ colorName }) => color(colorName)};
+    fill: ${color('link')};
     opacity: 0.5;
 `
 
 const ChartForeground = styled.circle`
-    stroke: ${({ colorName }) => color(colorName)};
+    stroke: ${color('link')};
 `
 
 export default memo(BlockCompletionIndicator)

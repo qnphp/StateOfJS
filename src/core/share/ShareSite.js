@@ -4,30 +4,34 @@ import ShareTwitter from './ShareTwitter'
 import ShareEmail from './ShareEmail'
 import ShareFacebook from './ShareFacebook'
 import ShareLinkedIn from './ShareLinkedIn'
-import { useI18n } from 'core/i18n/i18nContext'
-import { hashtag, year, siteTitle, siteUrl } from 'config/config.yml'
+import { usePageContext } from '../helpers/pageContext'
+import { useI18n } from '../i18n/i18nContext'
 
 const ShareSite = () => {
+    const context = usePageContext()
     const { translate } = useI18n()
 
-    const options = { values: { hashtag, year, siteTitle, link: siteUrl } }
-    const title = translate('share.site.title', options)
-    const twitterText = translate('share.site.twitter_text', options)
-    const subject = translate('share.site.subject', options)
-    const body = translate('share.site.body', options)
+    const link = context.host
+    const transOptions = {
+        values: { link }
+    }
+    const title = translate('share.site.title', transOptions)
+    const twitterText = translate('share.site.twitter_text', transOptions)
+    const subject = translate('share.site.subject', transOptions)
+    const body = translate('share.site.body', transOptions)
 
     return (
         <Container className="ShareSite">
             <ShareTwitter text={twitterText} />
-            <ShareFacebook link={siteUrl} />
-            <ShareLinkedIn link={siteUrl} title={title} />
+            <ShareFacebook link={link} />
+            <ShareLinkedIn link={link} title={title} />
             <ShareEmail subject={subject} body={body} />
         </Container>
     )
 }
 
 const Container = styled.div`
-    border-top: ${(props) => props.theme.separationBorder};
+    border-top: ${props => props.theme.separationBorder};
     display: flex;
     justify-content: space-evenly;
     position: relative;

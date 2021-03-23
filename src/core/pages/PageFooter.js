@@ -1,62 +1,61 @@
 import React from 'react'
 import isEmpty from 'lodash/isEmpty'
 import styled from 'styled-components'
-import { mq, spacing, fontSize } from 'core/theme'
+import mq from 'core/theme/mq'
 import { usePageContext } from 'core/helpers/pageContext'
+import { useI18n } from 'core/i18n/i18nContext'
 import Link from 'core/components/LocaleLink'
 import Button from 'core/components/Button'
 import PageLabel from './PageLabel'
-import config from 'config/config.yml'
-import T from 'core/i18n/T'
 
 const PageFooter = () => {
     const context = usePageContext()
+    const { translate } = useI18n()
 
     return (
-        <Container>
-            <Nav>
+        <Container className="PageFooter">
+            <Nav className="PageFooter__Nav">
                 {context.previous && !isEmpty(context.previous) && (
                     <PreviousLink
                         as={Link}
                         className="PageFooter__Link PageFooter__Link--previous"
-                        to={context.previous.path}
+                        to={`${context.localePath}${context.previous.path}`}
                     >
-                        «{' '}
-                        <LinkLabel>
-                            <T k="page.previous" />
-                        </LinkLabel>{' '}
-                        <PageLabel page={context.previous} />
+                        « {translate('general.previous')} <PageLabel page={context.previous} />
                     </PreviousLink>
                 )}
                 {context.next && !isEmpty(context.next) && (
                     <NextLink
                         as={Link}
                         className="PageFooter__Link PageFooter__Link--next Button"
-                        to={context.next.path}
+                        to={`${context.localePath}${context.next.path}`}
                     >
-                        <LinkLabel>
-                            <T k="page.next" />
-                        </LinkLabel>{' '}
-                        <PageLabel page={context.next} /> »
+                        {translate('general.next')} <PageLabel page={context.next} /> »
                     </NextLink>
                 )}
             </Nav>
             <Notes>
-                <T k="general.charts_nivo" values={{ link: 'https://nivo.rocks/' }} html={true} />{' '}
-                <T
-                    k="general.netlify_link"
-                    values={{ link: 'https://www.netlify.com' }}
-                    html={true}
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: translate('footer.state_of_js_link', {
+                            values: { link: 'http://stateofjs.com/' }
+                        })
+                    }}
+                />{' '}
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: translate('footer.leave_an_issue', {
+                            values: { link: 'https://github.com/StateOfJS/State-of-JS-2019/issues' }
+                        })
+                    }}
+                />{' '}
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: translate('footer.netlify', {
+                            values: { link: 'https://www.netlify.com' }
+                        })
+                    }}
                 />
-                <br />
-                <T k="general.leave_issue" values={{ link: config.issuesUrl }} html={true} />{' '}
-                <T k="general.join_discord" values={{ link: config.discordUrl }} html={true} />
-                {context.locale.id !== 'en-US' && (
-                    <>
-                        <br />
-                        <T k="general.translator_mode" />{' '}
-                    </>
-                )}
             </Notes>
         </Container>
     )
@@ -64,19 +63,14 @@ const PageFooter = () => {
 
 const Container = styled.div`
     @media ${mq.small} {
-        margin-top: ${spacing(4)};
+        margin-top: ${props => props.theme.spacing * 4}px;
     }
     @media ${mq.mediumLarge} {
-        margin-top: ${spacing(6)};
+        margin-top: ${props => props.theme.spacing * 6}px;
     }
 `
 
 const Nav = styled.div`
-    @media ${mq.small} {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        column-gap: ${spacing()};
-    }
     @media ${mq.mediumLarge} {
         display: flex;
         align-items: center;
@@ -85,14 +79,14 @@ const Nav = styled.div`
 `
 
 const Notes = styled.div`
-    font-size: ${fontSize('small')};
+    font-size: ${props => props.theme.typography.sizes.smaller};
     text-align: center;
 
     @media ${mq.small} {
-        margin-top: ${spacing(4)};
+        margin-top: ${props => props.theme.spacing * 4}px;
     }
     @media ${mq.mediumLarge} {
-        margin-top: ${spacing(6)};
+        margin-top: ${props => props.theme.spacing * 6}px;
     }
 `
 
@@ -100,25 +94,35 @@ const FooterLink = styled(Button)`
     @media ${mq.small} {
         display: block;
         text-align: center;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        width: 100%;
     }
 `
 
 const PreviousLink = styled(FooterLink)`
+    @media ${mq.small} {
+        margin-bottom: ${({ theme }) => theme.spacing}px;
+    }
     @media ${mq.mediumLarge} {
-        margin-right: ${spacing()};
+        margin-right: ${({ theme }) => theme.spacing}px;
+    }
+    
+    &,
+    &:link,
+    &:visited {
+        color: ${({ theme }) => theme.colors.link};
+    }
+
+    &,
+    &:hover {
+        background: ${({ theme }) => theme.colors.background};
+        border-color: ${({ theme }) => theme.colors.background};
+    }
+
+    &:hover {
+        color: ${({ theme }) => theme.colors.contrast};
+        text-decoration: underline;
     }
 `
 
 const NextLink = styled(FooterLink)``
-
-const LinkLabel = styled.span`
-    @media ${mq.small} {
-        display: none;
-    }
-`
 
 export default PageFooter

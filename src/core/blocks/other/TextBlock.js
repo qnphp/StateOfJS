@@ -1,11 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
 import ReactMarkdown from 'react-markdown/with-html'
-import { spacing } from 'core/theme'
 
 const Content = styled.div`
     li {
-        margin-bottom: ${spacing(0.5)};
+        margin-bottom: ${props => props.theme.spacing / 2}px;
     }
 `
 

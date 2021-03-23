@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { mq, spacing, fontSize } from 'core/theme'
+import mq from 'core/theme/mq'
 import PageLabel from './PageLabel'
 import PageLink from './PageLink'
 
@@ -11,52 +11,33 @@ const StyledLink = styled(PageLink)`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    justify-content: ${(props) => (props.type === 'previous' ? 'flex-start' : 'flex-end')};
-    padding: ${spacing()};
+    justify-content: ${props => (props.type === 'previous' ? 'flex-start' : 'flex-end')};
+    padding: ${props => props.theme.spacing}px;
 
     @media ${mq.smallMedium} {
-        font-size: ${fontSize('smaller')};
-        span {
-            display: block;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            width: 100%;
-            text-align: center;
-        }
+        font-size: ${props => props.theme.typography.sizes.smaller};
     }
     @media ${mq.large} {
-        font-size: ${fontSize('medium')};
+        font-size: ${props => props.theme.typography.sizes.medium};
     }
 
     &:hover {
-        background: ${(props) => props.theme.colors.backgroundAlt};
+        background: ${props => props.theme.colors.backgroundAlt};
     }
 `
 
 const PaginationLink = ({ page, type }) => (
     <StyledLink page={page} className={`pagination__link pagination__${type}`} type={type}>
-        {type === 'previous' && (
-            <span>
-                «&nbsp;
-                <PageLabel page={page} />
-            </span>
-        )}
-        {type === 'next' && (
-            <span>
-                <PageLabel page={page} />
-                &nbsp;»
-            </span>
-        )}
+        <PageLabel page={page} />
     </StyledLink>
 )
 
 PaginationLink.propTypes = {
     page: PropTypes.shape({
         id: PropTypes.string.isRequired,
-        path: PropTypes.string.isRequired,
+        path: PropTypes.string.isRequired
     }).isRequired,
-    type: PropTypes.oneOf(['previous', 'next']).isRequired,
+    type: PropTypes.oneOf(['previous', 'next']).isRequired
 }
 
 export default PaginationLink

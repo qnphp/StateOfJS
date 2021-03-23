@@ -1,6 +1,6 @@
-import React, { memo } from 'react'
+import React, { memo, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { useTheme } from 'styled-components'
+import { ThemeContext } from 'styled-components'
 
 /**
  * This component is used to render a custom label for charts,
@@ -14,7 +14,7 @@ const ChartLabel = ({
     textColor: _textColor,
     ...rest
 }) => {
-    const theme = useTheme()
+    const theme = useContext(ThemeContext)
 
     const outlineColor = _outlineColor || theme.colors.background
     const textColor = _textColor || theme.colors.text
@@ -31,7 +31,7 @@ const ChartLabel = ({
                     pointerEvents: 'none',
                     fontSize,
                     fontWeight: 600,
-                    opacity: 1,
+                    opacity: 1
                 }}
             >
                 {label}
@@ -43,7 +43,7 @@ const ChartLabel = ({
                 style={{
                     pointerEvents: 'none',
                     fontSize,
-                    fontWeight: 600,
+                    fontWeight: 600
                 }}
             >
                 {label}
@@ -56,7 +56,7 @@ ChartLabel.propTypes = {
     label: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     fontSize: PropTypes.number,
     outlineColor: PropTypes.string,
-    textColor: PropTypes.string,
+    textColor: PropTypes.string
 }
 
 export default memo(ChartLabel)

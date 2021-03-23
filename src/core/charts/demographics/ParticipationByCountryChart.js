@@ -1,16 +1,27 @@
-import React, { memo, useMemo } from 'react'
+import React, { memo, useMemo, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { useTheme } from 'styled-components'
+import { ThemeContext } from 'styled-components'
 import { ResponsiveChoroplethCanvas } from '@nivo/geo'
 import countries from 'data/geo/world_countries'
+import { colors } from 'core/constants'
 import ParticipationByCountryTooltip from './ParticipationByCountryTooltip'
 
-const features = countries.features.map((feature) => {
+const features = countries.features.map(feature => {
     return {
         ...feature,
-        id: feature.id,
+        id: feature.id
     }
 })
+
+const colorRange = [
+    colors.teal,
+    colors.tealLight,
+    colors.tealLighter,
+    colors.redLighter,
+    colors.red,
+    colors.redDark,
+    colors.redDarker
+]
 
 const chartLegends = [
     {
@@ -22,24 +33,23 @@ const chartLegends = [
         itemWidth: 100,
         itemHeight: 18,
         itemDirection: 'left-to-right',
+        itemTextColor: colors.tealLight,
         symbolSize: 18,
-        justify: true,
-    },
+        justify: true
+    }
 ]
 
 const ParticipationByCountryChart = ({ units, data }) => {
-    const theme = useTheme()
+    const theme = useContext(ThemeContext)
 
     const mergedTheme = {
         ...theme.charts,
-        // background: theme.colors.backgroundAlt,
+        background: theme.colors.backgroundAlt
     }
 
-    const colorRange = theme.colors.countries
-
     const formatValue = useMemo(() => {
-        if (units === 'percentage') return (v) => `${v.toFixed(1)}%`
-        return (v) => Math.round(v)
+        if (units === 'percentage') return v => `${v.toFixed(1)}%`
+        return v => Math.round(v)
     }, [units])
 
     return (
@@ -50,7 +60,7 @@ const ParticipationByCountryChart = ({ units, data }) => {
             valueFormat={formatValue}
             domain={units === 'percentage' ? [0, 8] : [0, 1000]}
             colors={colorRange}
-            unknownColor={theme.colors.backgroundAlt}
+            unknownColor={theme.colors.background}
             projectionScale={118}
             projectionTranslation={[0.5, 0.7]}
             projectionRotation={[-11, 0, 0]}
@@ -70,9 +80,9 @@ ParticipationByCountryChart.propTypes = {
         PropTypes.shape({
             id: PropTypes.string.isRequired,
             count: PropTypes.number.isRequired,
-            percentage: PropTypes.number.isRequired,
+            percentage: PropTypes.number.isRequired
         })
-    ).isRequired,
+    ).isRequired
 }
 
 export default memo(ParticipationByCountryChart)

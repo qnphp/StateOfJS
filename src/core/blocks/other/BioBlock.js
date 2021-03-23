@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown/with-html'
 import styled from 'styled-components'
-import { mq, spacing, fontSize } from 'core/theme'
+import mq from 'core/theme/mq'
 
 const BioBlock = ({ subheading, heading, photo, bio }) => {
     return (
@@ -25,12 +25,12 @@ const BioBlock = ({ subheading, heading, photo, bio }) => {
 
 const Bio = styled.div`
     background: ${({ theme }) => theme.colors.backgroundAlt};
-    margin-top: ${spacing(2)};
+    margin-top: ${({ theme }) => theme.spacing * 2}px;
     box-shadow: ${({ theme }) => theme.blockShadow};
 `
 
 const BioHeading = styled.h3`
-    margin-bottom: ${spacing(0.33)};
+    margin-bottom: ${({ theme }) => theme.spacing / 3}px;
 `
 
 const BioContent = styled.div`
@@ -45,8 +45,8 @@ const BioContent = styled.div`
 `
 
 const BioBio = styled.div`
-    padding: ${spacing()};
-    font-size: ${fontSize('smallish')};
+    padding: ${({ theme }) => theme.spacing}px;
+    font-size: ${({ theme }) => theme.typography.sizes.smallish};
 `
 
 const BioPhoto = styled.div`
@@ -55,7 +55,7 @@ const BioPhoto = styled.div`
     @media ${mq.smallMedium} {
         max-width: 120px;
         margin: 0 auto;
-        padding-top: ${spacing()};
+        padding-top: ${({ theme }) => theme.spacing}px;
     }
 
     img {

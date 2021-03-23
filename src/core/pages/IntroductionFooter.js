@@ -4,7 +4,6 @@ import { usePageContext } from 'core/helpers/pageContext'
 import { useI18n } from 'core/i18n/i18nContext'
 import Link from 'core/components/LocaleLink'
 import Button from 'core/components/Button'
-import { spacing } from 'core/theme'
 
 const IntroductionFooter = () => {
     const context = usePageContext()
@@ -16,16 +15,16 @@ const IntroductionFooter = () => {
                 as={Link}
                 size="large"
                 className="IntroductionFooter__Link--start"
-                to={context.next.path}
+                to={`${context.localePath}${context.next.path}`}
             >
-                {translate('results.start')} »
+                {translate('general.start')} »
             </Button>
         </Container>
     )
 }
 
 const Container = styled.div`
-    margin: ${spacing(2)} 0;
+    margin: ${({ theme }) => theme.spacing * 2}px 0;
 `
 
 export default IntroductionFooter

@@ -1,38 +1,36 @@
-import React, { memo, useState, useCallback } from 'react'
+import React, { memo, useState, useCallback, useContext } from 'react'
 import PropTypes from 'prop-types'
-import styled, { useTheme, keyframes } from 'styled-components'
+import styled, { ThemeContext, keyframes } from 'styled-components'
 import ReactMarkdown from 'react-markdown'
 import Confetti from 'react-confetti'
 import tinycolor from 'tinycolor2'
 import ShareBlock from 'core/share/ShareBlock'
 import { useI18n } from 'core/i18n/i18nContext'
-import { mq, spacing, fontSize } from 'core/theme'
+import PeriodicElement from 'core/blocks/tools/ToolPeriodicElement'
+import mq from 'core/theme/mq'
+import periodicTableData from '../../../../config/periodic_table.yml'
 import AwardIcon from './AwardIcon'
-import { useEntities } from 'core/entities/entitiesContext'
-import T from 'core/i18n/T'
 
 const AwardBlock = ({ block }) => {
-    const { getEntity } = useEntities()
-
     const { id, awards } = block
     const type = id
     const { translate } = useI18n()
-    const theme = useTheme()
+    const theme = useContext(ThemeContext)
 
     const [isRevealed, setIsRevealed] = useState(false)
     const handleClick = useCallback(() => {
         setIsRevealed(true)
     }, [setIsRevealed])
 
-    const awardsWithEntities = awards.map((a) => ({ ...a, entity: getEntity(a.id) }))
-    const winner = awardsWithEntities[0]
-    const runnerUps = awardsWithEntities.slice(1)
+    const winner = awards[0]
+    const runnerUps = awards.slice(1)
+    const items = awards
 
     return (
         <Container className={`Award Award--${isRevealed ? 'show' : 'hide'}`} id={type}>
             <Heading className="Award__Heading">{translate(`award.${type}.title`)}</Heading>
             <Description className="Award__Description">
-                <T k={`award.${type}.description`} />
+                {translate(`award.${type}.description`)}
             </Description>
             <ElementContainer className="Award__Element__Container">
                 <Element className="Award__Element" onClick={handleClick}>
@@ -54,45 +52,40 @@ const AwardBlock = ({ block }) => {
                                 />
                             </ConfettiContainer>
                         )}
-                        {/* <PeriodicElement
+                        <PeriodicElement
                             tool={winner.id}
-                            name={winner.name || winner.id}
+                            name={winner.name}
                             symbol={periodicTableData.tools[winner.id] || '??'}
                             number={`#1` || '?'}
-                        /> */}
-                        <Winner>
-                            <EntityItem entity={winner.entity} />
-                        </Winner>
+                        />
                     </BackSide>
                 </Element>
             </ElementContainer>
             <Comment className="Award__Comment">
-                <T k={`award.${type}.comment`} md={true} values={{ value: winner.value }} />
+                <ReactMarkdown
+                    source={translate(`award.${type}.comment`, {
+                        values: { items }
+                    })}
+                />
                 <ShareBlock
-                    title={`${translate(`award.${type}.title`)}`}
+                    title={`${translate(`award.${type}.title`)} Award`}
                     block={block}
                     className="Award__Share"
                 />
             </Comment>
             <div className="Awards__RunnerUps">
                 <RunnerUpsHeading className="Awards__RunnerUps__Heading">
-                    <T k="awards.runner_ups" />
+                    {translate(`awards.runner_ups`)}
                 </RunnerUpsHeading>
                 {runnerUps.map((runnerUp, i) => (
                     <RunnerUpsItem key={runnerUp.id} className="Awards__RunnerUps__Item">
-                        {i + 2}. <EntityItem entity={runnerUp.entity} />
+                        {i + 2}. {runnerUp.name}
                         {runnerUp.value ? `: ${runnerUp.value}` : ''}
                     </RunnerUpsItem>
                 ))}
             </div>
         </Container>
     )
-}
-
-const EntityItem = ({ entity }) => {
-    const { name, homepage, mdn } = entity
-    const url = homepage || (mdn && `https://developer.mozilla.org${mdn.url}`)
-    return url ? <a href={url}>{name}</a> : <span>{name}</span>
 }
 
 AwardBlock.propTypes = {
@@ -102,10 +95,10 @@ AwardBlock.propTypes = {
             PropTypes.shape({
                 id: PropTypes.string.isRequired,
                 name: PropTypes.string.isRequired,
-                value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).number,
+                value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).number
             })
-        ).isRequired,
-    }).isRequired,
+        ).isRequired
+    }).isRequired
 }
 
 const Container = styled.div`
@@ -115,22 +108,22 @@ const Container = styled.div`
     align-items: center;
 
     @media ${mq.smallMedium} {
-        margin-bottom: ${spacing(3)};
+        margin-bottom: ${({ theme }) => theme.spacing * 3}px;
     }
 
     .Award__Share {
-        margin-bottom: ${spacing()};
+        margin-bottom: ${({ theme }) => theme.spacing}px;
     }
 `
 
 const Heading = styled.h3`
-    margin-bottom: ${spacing(0.25)};
+    margin-bottom: ${({ theme }) => theme.spacing / 4}px;
     font-size: 1.5rem;
 `
 
 const Description = styled.div`
-    margin-bottom: ${spacing()};
-    font-size: ${fontSize('smallish')};
+    margin-bottom: ${({ theme }) => theme.spacing}px;
+    font-size: ${({ theme }) => theme.typography.sizes.smallish};
 `
 
 const ElementContainer = styled.div`
@@ -138,12 +131,15 @@ const ElementContainer = styled.div`
     height: 150px;
     width: 150px;
     perspective: 800px;
-    margin-bottom: ${spacing()};
+    margin-bottom: ${({ theme }) => theme.spacing}px;
 `
 
-const getGlowColor = (color, alpha) => tinycolor(color).setAlpha(alpha).toRgbString()
+const getGlowColor = (color, alpha) =>
+    tinycolor(color)
+        .setAlpha(alpha)
+        .toRgbString()
 
-const glowSoft = (theme) => keyframes`
+const glowSoft = theme => keyframes`
     from {
         box-shadow: 0px 1px 1px 1px ${getGlowColor(theme.colors.link, 0.1)};
     }
@@ -155,7 +151,7 @@ const glowSoft = (theme) => keyframes`
     }
 `
 
-const glow = (theme) => keyframes`
+const glow = theme => keyframes`
     from {
         box-shadow: 0px 1px 2px 1px ${getGlowColor(theme.colors.link, 0.5)};
     }
@@ -167,7 +163,7 @@ const glow = (theme) => keyframes`
     }
 `
 
-const burst = (theme) => keyframes`
+const burst = theme => keyframes`
     from {
         box-shadow: 0px 0px 0px 0px ${getGlowColor(theme.colors.link, 0)};
     }
@@ -187,7 +183,7 @@ const Element = styled.div`
     transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform: rotateY(0deg) scale(0.75);
     cursor: pointer;
-    margin-bottom: ${spacing()};
+    margin-bottom: ${({ theme }) => theme.spacing}px;
 
     svg {
         display: block;
@@ -228,7 +224,7 @@ const Side = styled.div`
 
 const FrontSide = styled(Side)`
     background: ${({ theme }) => theme.colors.backgroundAlt};
-    padding: ${spacing(0.5)};
+    padding: ${({ theme }) => theme.spacing / 2}px;
 
     svg {
         .bg {
@@ -255,7 +251,7 @@ const FrontSide = styled(Side)`
 const BackSide = styled(Side)`
     background: ${({ theme }) => theme.colors.background};
     transform: rotateY(180deg);
-    font-size: ${fontSize('largest')};
+    font-size: ${({ theme }) => theme.typography.sizes.largest};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -268,7 +264,7 @@ const Comment = styled.div`
     align-items: center;
 
     p {
-        margin-bottom: ${spacing(0.5)};
+        margin-bottom: ${({ theme }) => theme.spacing / 2}px;
     }
 
     .Award--hide & {
@@ -293,7 +289,7 @@ const RunnerUpsHeading = styled.h4`
 
 const RunnerUpsItem = styled.div`
     opacity: 0;
-    font-size: ${fontSize('smallish')};
+    font-size: ${({ theme }) => theme.typography.sizes.smallish};
 
     .Award--show &,
     .capture & {
@@ -317,7 +313,5 @@ const ConfettiContainer = styled.div`
         transform: translate(-50%, -50%);
     }
 `
-
-const Winner = styled.div``
 
 export default memo(AwardBlock)

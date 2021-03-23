@@ -1,7 +1,7 @@
 import { getToolName } from 'core/helpers/tools'
-import get from 'lodash/get'
-import config from 'config/config.yml'
-import { getBlockImage } from './blockHelpers'
+import { websiteTitle } from 'core/constants.js'
+
+const WEBSITE_TITLE = websiteTitle
 
 export const getTranslationValuesFromContext = (context, translate) => {
     const values = {}
@@ -15,15 +15,28 @@ export const getTranslationValuesFromContext = (context, translate) => {
     return values
 }
 
-export const getPageLabelKey = (page) => page.titleId || `sections.${page.id}.title`
-
-export const getPageLabel = (page, translate, { includeWebsite = false } = {}) => {
+export const getPageLabel = (
+    page,
+    translate,
+    { isContextual = false, includeWebsite = false } = {}
+) => {
     let label
 
-    label = translate(getPageLabelKey(page))
+    if (['features_intro', 'features_results', 'features_conclusion'].includes(page.type)) {
+        label = translate(
+            `page.${page.type}.${isContextual === true ? 'contextual_label' : 'label'}`,
+            {
+                values: {
+                    section: translate(`features.${page.data.section}`)
+                }
+            }
+        )
+    } else {
+        label = translate(`page.${page.id}`)
+    }
 
     if (includeWebsite === true) {
-        label = `${config.siteTitle}: ${label}`
+        label = `${WEBSITE_TITLE}: ${label}`
     }
 
     return label
@@ -31,33 +44,35 @@ export const getPageLabel = (page, translate, { includeWebsite = false } = {}) =
 
 /**
  * example:
- *   http://2018.stateofjs.com/images/captures/en-US/front-end_overview.png
+ *   http://2018.stateofjs.com/images/captures/front-end_overview.png
  */
-export const getPageImageUrl = (context) => {
+export const getPageImageUrl = context => {
     const baseUrl = `${context.host}/images/`
 
     let imageUrl
     if (context.block !== undefined) {
-        imageUrl = getBlockImage(context.block, context)
+        imageUrl = `${baseUrl}captures/${context.block.id}.png`
+        // imageUrl = `${baseUrl}captures/${context.basePath
+        //     .replace(/^\//, '')
+        //     .replace(/\/$/, '')
+        //     .replace(/\//g, '_')}_${context.block.id}.png`
     } else {
-        imageUrl = `${baseUrl}${config.socialMediaImage}`
+        imageUrl = `${baseUrl}stateofjs-socialmedia.png`
     }
 
     return imageUrl
 }
 
 export const getPageMeta = (context, translate, overrides = {}) => {
-    const url = `${context.host}${get(context, 'locale.path')}${context.basePath}`
+    const url = `${context.host}${context.localePath}${context.basePath}`
     const imageUrl = getPageImageUrl(context)
     const isRoot = context.path === '/' || context.basePath === '/'
 
     const meta = {
         url,
-        title: isRoot
-            ? config.siteTitle
-            : getPageLabel(context, translate, { includeWebsite: true }),
+        title: isRoot ? WEBSITE_TITLE : getPageLabel(context, translate, { includeWebsite: true }),
         imageUrl,
-        ...overrides,
+        ...overrides
     }
 
     return meta
@@ -65,6 +80,7 @@ export const getPageMeta = (context, translate, overrides = {}) => {
 
 export const getPageSocialMeta = (context, translate, overrides = {}) => {
     const meta = getPageMeta(context, translate, overrides)
+
     const socialMeta = [
         // facebook
         { property: 'og:type', content: 'article' },
@@ -76,7 +92,7 @@ export const getPageSocialMeta = (context, translate, overrides = {}) => {
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:image:src', content: meta.imageUrl },
         { name: 'twitter:title', content: meta.title },
-        { name: 'twitter:description', content: meta.description },
+        { name: 'twitter:description', content: meta.description }
     ]
 
     return socialMeta.filter(({ content }) => content !== undefined)
@@ -91,7 +107,7 @@ export const mergePageContext = (pageContext, location, state) => {
     const isDebugEnabled =
         location && location.search ? location.search.indexOf('debug') !== -1 : false
 
-    let host = config.siteUrl
+    let host = 'https://2019.stateofjs.com'
     if (location && location.host && location.protocol) {
         host = `${location.protocol}//${location.host}`
     }
@@ -102,6 +118,6 @@ export const mergePageContext = (pageContext, location, state) => {
         currentPath: location ? location.pathname : undefined,
         isCapturing,
         isDebugEnabled,
-        ...state,
+        ...state
     }
 }

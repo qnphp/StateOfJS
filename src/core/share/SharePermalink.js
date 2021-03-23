@@ -8,21 +8,20 @@ const Link = styled.a`
     opacity: 0;
     line-height: 1;
     width: 22px;
-    margin-left: -30px;
-    margin-right: 8px;
+    margin-left: -22px;
+    padding-right: 4px;
     transition: none;
     position: relative;
-
+    
     @media ${mq.small} {
-        /* top: 3px; */
-        display: none;
+        top: 3px;
     }
     @media ${mq.mediumLarge} {
-        top: 1px;
+        top: 7px;
     }
-
+    
     path {
-        fill: rgba(255, 255, 255, 0.4);
+        fill: rgba(255, 255, 255, .4);
     }
 `
 

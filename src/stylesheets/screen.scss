@@ -15,13 +15,16 @@ Global
 
 */
 @import '_global.scss';
+@import '_layout.scss';
 
 /*
 
 Elements
 
 */
-@import '_logo.scss';
+@import '_sidebar.scss';
+@import '_tooltips.scss';
+@import '_newsletter.scss';
 @import '_features.scss';
 
 /*
@@ -31,3 +34,7 @@ Charts
 */
 
 @import '_charts.scss';
+@import '_legends.scss';
+
+@import '_capture.scss';
+@import '_mosaic.scss';

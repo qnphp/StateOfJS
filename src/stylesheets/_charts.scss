@@ -1,3 +1,39 @@
+
+.Help {
+    font-size: 13px;
+    color: #6f8183;
+    margin-bottom: 20px;
+    padding-left: 15px;
+}
+.Help svg {
+    color: rgb(150, 136, 228);
+    display: inline-block;
+    vertical-align: text-bottom;
+}
+
+.Overview__Chart {
+    .Legends {
+        @include small-medium {
+            margin-top: $spacing;
+        }
+        @include large {
+            margin-top: $spacing * 2;
+        }
+    }
+}
+
+.ToolsUsageByCountry__Chart,
+.SalaryPerCountry__Chart {
+    height: 500px;
+}
+
+.ToolsOverviewBlock {
+    .Legends {
+        margin-top: $spacing * 2;
+    }
+}
+
+
 /*
 
 Vertical Bar Chart
@@ -14,21 +50,27 @@ Vertical Bar Chart
 Gauge Chart
 
 */
+.FTBlock {
+    .Legends__Item__Value {
+        @include large {
+            display: none;
+        }
+    }
+}
 
 .FeaturesOverviewChart {
-    height: 100%;
-    // @include xsmall {
-    //     height: 800px;
-    // }
-    // @include small {
-    //     height: 800px;
-    // }
-    // @include medium {
-    //     height: 800px;
-    // }
-    // @include large {
-    //     height: 800px;
-    // }
+    @include xsmall {
+        height: 800px;
+    }
+    @include small {
+        height: 800px;
+    }
+    @include medium {
+        height: 800px;
+    }
+    @include large {
+        height: 800px;
+    }
 }
 .FeaturesSectionOverviewChart {
     @include xsmall {
@@ -83,8 +125,7 @@ Quadrant/Scatterplot Chart
     font-size: $larger-font;
 }
 .Scatterplot__Node {
-    transition: all 500ms ease-out;
-    &--active {
+    &:hover {
         .Scatterplot__Node__Crosshairs {
             opacity: 1;
             transition: all 200ms ease-out;
@@ -104,10 +145,6 @@ Quadrant/Scatterplot Chart
         .Scatterplot__Node__Crosshair__Line {
             @include svgAnts;
         }
-    }
-    &--inactive{
-        opacity: 0.3;
-        transition: all 500ms ease-out;
     }
 }
 .Scatterplot__Node__Label {

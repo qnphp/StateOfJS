@@ -1,9 +1,13 @@
 import React from 'react'
-import styled from 'styled-components'
-import { color } from 'core/theme'
 
 const Hamburger = () => (
-    <Container xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="100"
+        height="100"
+        viewBox="0 0 100 100"
+        className="Hamburger"
+    >
         <g id="Outline_Icons">
             <line
                 fill="none"
@@ -39,11 +43,7 @@ const Hamburger = () => (
                 y2="75"
             />
         </g>
-    </Container>
+    </svg>
 )
-
-const Container = styled.svg`
-    stroke: ${color('link')};
-`
 
 export default Hamburger

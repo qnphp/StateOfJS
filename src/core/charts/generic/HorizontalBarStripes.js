@@ -1,8 +1,8 @@
-import React, { memo } from 'react'
-import { useTheme } from 'styled-components'
+import React, { memo, useContext } from 'react'
+import { ThemeContext } from 'styled-components'
 
 const HorizontalBarStripes = ({ bars, width, yScale }) => {
-    const theme = useTheme()
+    const theme = useContext(ThemeContext)
 
     const step = yScale.step()
 

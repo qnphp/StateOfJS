@@ -1,10 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 import Link from 'core/components/LocaleLink'
-import sponsors from 'config/sponsors.yml'
+import sponsors from 'data/sponsors.yml'
 import { useI18n } from 'core/i18n/i18nContext'
-import { mq, spacing, fontSize } from 'core/theme'
-import TextBlock from 'core/blocks/other/TextBlock'
+import mq from 'core/theme/mq'
 
 const SponsorsBlock = () => {
     const { translate } = useI18n()
@@ -12,18 +11,13 @@ const SponsorsBlock = () => {
     return (
         <>
             <Container>
-                <Header>{translate('partners.our_partners')}</Header>
+                <Header>{translate('partners.our_partners')}:</Header>
                 <SponsorList className="Sponsor__list">
-                    {sponsors.map(({ name, image, url, id, description }) => (
+                    {sponsors.map(({ name, image, url, id }) => (
                         <Sponsor className={`Sponsor Sponsor--${id}`} key={name}>
-                            <SponsorLogo>
-                                <a href={url} title={name}>
-                                    <img src={`/images/sponsors/${image}`} alt={name} />
-                                </a>
-                            </SponsorLogo>
-                            <SponsorDescription>
-                                <TextBlock text={description} />
-                            </SponsorDescription>
+                            <a href={url} title={name}>
+                                <img src={`/images/sponsors/${image}`} alt={name} />
+                            </a>
                         </Sponsor>
                     ))}
                 </SponsorList>
@@ -36,39 +30,36 @@ const SponsorsBlock = () => {
 }
 
 const Container = styled.div`
-    background: ${(props) => props.theme.colors.backgroundAlt};
-    padding: ${spacing(2)};
-    margin-top: ${spacing(2)};
+    background: ${props => props.theme.colors.backgroundAlt};
+    padding: ${props => props.theme.spacing * 1.5}px;
+    margin-top: ${props => props.theme.spacing * 2}px;
 `
 
 const Header = styled.h3`
     text-align: center;
-    margin-bottom: ${spacing()};
+    margin-bottom: ${props => props.theme.spacing}px;
 `
 
 const SponsorList = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-@media ${mq.large} {
-        display: grid;
-        grid-template-columns: repeat( auto-fit, minmax(250px, 1fr) );
-        column-gap: ${spacing(4)};
+    @media ${mq.smallMedium} {
+        flex-direction: column;
     }
 `
 
 const Sponsor = styled.div`
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-`
+    width: 150px;
 
-const SponsorLogo = styled.div`
-    height: 80px;
+    @media ${mq.smallMedium} {
+        margin-bottom: ${({ theme }) => theme.spacing}px;
+    }
 
-    display: grid;
-    place-items: center;
-
-    margin-bottom: ${spacing()};
+    @media ${mq.large} {
+        margin-right: ${({ theme }) => theme.spacing * 3}px;
+    }
 
     &:last-child {
         margin: 0;
@@ -78,22 +69,17 @@ const SponsorLogo = styled.div`
     svg,
     img {
         display: block;
-        width: 200px;
+        width: 100%;
     }
     &--designcode {
         width: 50px;
     }
 `
 
-const SponsorDescription = styled.div`
-    @media ${mq.smallMedium} {
-        text-align: center;
-    }
-`
 const Support = styled.div`
     text-align: center;
-    margin-top: ${spacing(0.5)};
-    font-size: ${fontSize('smallish')};
+    margin-top: ${({ theme }) => theme.spacing / 2}px;
+    font-size: ${({ theme }) => theme.typography.sizes.smallish};
 `
 
 export default SponsorsBlock

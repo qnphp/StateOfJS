@@ -1,11 +1,10 @@
 import React, { memo, useState } from 'react'
 import PropTypes from 'prop-types'
-import { keys } from 'core/bucket_keys'
+import { keys } from 'core/constants'
 import Block from 'core/blocks/block/Block'
 import ChartContainer from 'core/charts/ChartContainer'
 import VerticalBarChart from 'core/charts/generic/VerticalBarChart'
 import { usePageContext } from 'core/helpers/pageContext'
-import { useBucketKeys } from 'core/helpers/useBucketKeys'
 
 const VerticalBarBlock = ({ block, data }) => {
     if (!data) {
@@ -18,9 +17,7 @@ const VerticalBarBlock = ({ block, data }) => {
         mode = 'relative',
         units: defaultUnits = 'percentage',
         translateData,
-        bucketKeysName = id,
-        i18nNamespace,
-        colorVariant,
+        bucketKeysName = id
     } = block
 
     const context = usePageContext()
@@ -28,16 +25,21 @@ const VerticalBarBlock = ({ block, data }) => {
 
     const [units, setUnits] = useState(defaultUnits)
 
-    const bucketKeys = useBucketKeys(bucketKeysName)
+    const bucketKeys = keys[bucketKeysName]
+
+    if (!bucketKeys) {
+        throw new Error(`Could not find bucket keys for "${bucketKeysName}"`)
+    }
+
     const { buckets, total, completion } = data
 
     const sortedBuckets = bucketKeys.map(({ id: bucketKey }) => {
-        const bucket = buckets.find((b) => b.id === bucketKey)
+        const bucket = buckets.find(b => b.id === bucketKey)
         if (bucket === undefined) {
             return {
                 id: bucketKey,
                 count: 0,
-                percentage: 0,
+                percentage: 0
             }
             // throw new Error(`no bucket found for key: '${bucketKey}' in block: ${block.id}`)
         }
@@ -55,15 +57,14 @@ const VerticalBarBlock = ({ block, data }) => {
         >
             <ChartContainer fit={true}>
                 <VerticalBarChart
-                    bucketKeys={bucketKeys}
+                    keys={bucketKeys}
                     total={total}
                     buckets={sortedBuckets}
-                    i18nNamespace={i18nNamespace || id}
+                    i18nNamespace={block.id}
                     translateData={translateData}
                     mode={mode}
                     units={units}
                     viewportWidth={width}
-                    colorVariant={colorVariant}
                 />
             </ChartContainer>
         </Block>
@@ -77,16 +78,15 @@ VerticalBarBlock.propTypes = {
         bucketKeysName: PropTypes.oneOf(Object.keys(keys)),
         showDescription: PropTypes.bool,
         mode: PropTypes.oneOf(['absolute', 'relative']),
-        units: PropTypes.oneOf(['percentage', 'count']),
-        colorVariant: PropTypes.oneOf(['primary', 'secondary']),
+        units: PropTypes.oneOf(['percentage', 'count'])
     }).isRequired,
     data: PropTypes.shape({
         buckets: PropTypes.arrayOf(
             PropTypes.shape({
-                id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+                id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
             })
-        ).isRequired,
-    }).isRequired,
+        ).isRequired
+    }).isRequired
 }
 
 export default memo(VerticalBarBlock)

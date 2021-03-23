@@ -1,26 +1,24 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import styled, { css } from 'styled-components'
-import { spacing } from 'core/theme'
+import styled from 'styled-components'
 
 export default class LegendsItem extends Component {
     static propTypes = {
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         label: PropTypes.string.isRequired,
-        shortLabel: PropTypes.string,
         color: PropTypes.string,
+        keyLabel: PropTypes.string,
         style: PropTypes.object.isRequired,
         chipSize: PropTypes.number.isRequired,
         chipStyle: PropTypes.object.isRequired,
         onMouseEnter: PropTypes.func,
         onMouseLeave: PropTypes.func,
-        onClick: PropTypes.func,
-        isCurrent: PropTypes.bool,
+        onClick: PropTypes.func
     }
 
     static defaultProps = {
         style: {},
-        chipStyle: {},
+        chipStyle: {}
     }
 
     handleMouseEnter = () => {
@@ -43,61 +41,46 @@ export default class LegendsItem extends Component {
 
     render() {
         const {
-            id,
             color,
             label,
-            shortLabel,
+            keyLabel,
             chipSize,
             style,
             chipStyle,
             data,
             units,
-            onMouseEnter,
-            useShortLabels,
-            layout,
-            current = null,
+            onMouseEnter
         } = this.props
 
         const isInteractive = typeof onMouseEnter !== 'undefined'
 
-        const state = current === null ? 'default' : current === id ? 'active' : 'inactive'
-
         return (
             <Container
-                className={`Legends__Item ${shortLabel ? 'Legends__Item--withKeyLabel' : ''}`}
+                className={`Legends__Item ${keyLabel ? 'Legends__Item--withKeyLabel' : ''}`}
                 style={style}
                 isInteractive={isInteractive}
                 onMouseEnter={this.handleMouseEnter}
                 onMouseLeave={this.handleMouseLeave}
                 onClick={this.handleClick}
-                state={state}
             >
-                {color && (
-                    <ChipWrapper layout={layout}>
-                        <Chip
-                            style={{
-                                width: chipSize,
-                                height: chipSize,
-                                background: color,
-                                ...chipStyle,
-                            }}
-                        />
-                    </ChipWrapper>
-                )}
-                {!color && shortLabel && (
-                    <KeyLabel layout={layout} className="Legends__Item__KeyLabel">
-                        {shortLabel}{' '}
-                    </KeyLabel>
-                )}
+                {color ? (
+                    <Chip
+                        style={{
+                            width: chipSize,
+                            height: chipSize,
+                            background: color,
+                            ...chipStyle
+                        }}
+                    />
+                ) : keyLabel ? (
+                    <span className="Legends__Item__KeyLabel">{keyLabel} </span>
+                ) : null}
                 <Label
-                    layout={layout}
                     className="Legends__Item__Label"
-                    dangerouslySetInnerHTML={{
-                        __html: useShortLabels ? shortLabel || label : label,
-                    }}
+                    dangerouslySetInnerHTML={{ __html: label }}
                 />
                 {data && (
-                    <Value layout={layout} className="Legends__Item__Value">
+                    <Value className="Legends__Item__Value">
                         {units === 'percentage' ? `${data[units]}%` : data[units]}
                     </Value>
                 )}
@@ -106,52 +89,39 @@ export default class LegendsItem extends Component {
     }
 }
 
-const Container = styled.tr`
+const Container = styled.div`
+    display: flex;
+    align-items: center;
     cursor: default;
+    flex: 1;
 
     &:last-child {
         margin-bottom: 0;
     }
 
-    ${({ isInteractive, theme }) => {
-        if (isInteractive) {
-            return css`
+    ${props => {
+        if (props.isInteractive) {
+            return `
                 cursor: pointer;
                 &:hover {
-                    background: ${theme.colors.backgroundAlt};
+                    background: ${props.theme.colors.backgroundAlt};
                 }
             `
         }
     }}
-
-    ${({ state, theme }) => {
-        if (state === 'active') {
-            return css`
-                /* background: ${theme.colors.backgroundAlt}; */
-            `
-        } else if (state === 'inactive') {
-            return css`
-                opacity: 0.25;
-            `
-        }
-    }}
 `
 
-const ChipWrapper = styled.th`
-    padding: ${spacing(0.25)} ${spacing(0.5)} ${spacing(0.25)} 0;
-`
-const Chip = styled.div``
-
-const KeyLabel = styled.th`
-    padding: ${spacing(0.25)} ${spacing(0.5)} ${spacing(0.25)} 0;
-    text-align: left;
+const Chip = styled.span`
+    display: block;
+    margin-right: ${props => props.theme.spacing / 2}px;
+    flex-shrink: 0;
 `
 
-const Label = styled.td`
-    padding: ${spacing(0.25)} ${spacing(0.5)} ${spacing(0.25)} 0;
-    width: 100%;
+const Label = styled.span`
+    padding-right: ${props => props.theme.spacing}px;
 `
 
-const Value = styled.td`
-    padding: ${spacing(0.25)} ${spacing(0.5)} ${spacing(0.25)} 0;
+const Value = styled.span`
+    display: inline-block;
+    margin-left: ${props => props.theme.spacing / 2}px;
 `

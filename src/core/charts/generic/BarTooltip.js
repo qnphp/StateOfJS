@@ -12,7 +12,7 @@ const BarTooltip = ({ indexValue, data, i18nNamespace, shouldTranslate }) => {
     const { getName } = useEntities()
     const { translate } = useI18n()
     const label = shouldTranslate
-        ? translate(`options.${i18nNamespace}.${indexValue}`)
+        ? translate(`${i18nNamespace}.${indexValue}.long`)
         : getName(indexValue)
 
     return (
@@ -25,13 +25,13 @@ const BarTooltip = ({ indexValue, data, i18nNamespace, shouldTranslate }) => {
 }
 
 BarTooltip.propTypes = {
-    indexValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    indexValue: PropTypes.string.isRequired,
     data: PropTypes.shape({
         percentage: PropTypes.number.isRequired,
-        count: PropTypes.number.isRequired,
+        count: PropTypes.number.isRequired
     }).isRequired,
     i18nNamespace: PropTypes.string.isRequired,
-    shouldTranslate: PropTypes.bool.isRequired,
+    shouldTranslate: PropTypes.bool.isRequired
 }
 
 export default memo(BarTooltip)
